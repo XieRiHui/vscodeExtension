@@ -1,7 +1,9 @@
 {
-  "name": "df",
-  "displayName": "df",
-  "description": "no",
+  "name": "PysExtension",
+  "displayName": "PysExtension",
+  "description": "This is a demo for pys to develop vscode extension.",
+  "author": "XieRiHui",
+  "private":"true",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.99.0"
