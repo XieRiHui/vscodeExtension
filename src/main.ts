@@ -29,3 +29,6 @@ export function getFunctionNode(code:string,index:number):FunctionNode| undefine
     });
     return functionNode;
 }
+import * as vscode from 'vscode';
+// import fetch from 'node-fetch';
+

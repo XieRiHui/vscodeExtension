@@ -3,7 +3,7 @@
   "displayName": "PysExtension",
   "description": "This is a demo for pys to develop vscode extension.",
   "author": "XieRiHui",
-  "private":"true",
+  "private": "true",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.99.0"
@@ -11,13 +11,36 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onCommand:df.helloWorld"],
+  "activationEvents": [
+    "onLanguage:javascript"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "智谱AI设置",
+      "properties": {
+        "zhipuAI.apiKey": {
+          "type": "string",
+          "default": "f0575c1d15d4a144cfaa462e444e9f94.KfWUFp9vWyf757QF",
+          "description": "智谱AIAPI密钥"
+        }
+      }
+    },
     "commands": [
       {
         "command": "df.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "df.func2",
+        "title": "Func2"
+      }
+    ],
+    "keybindings":[
+      {
+        "command": "df.func2",
+        "key": "ctrl+0",
+        "when":"editorTextFocus"
       }
     ]
   },
@@ -30,14 +53,17 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.99.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.99.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "typescript": "^5.8.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "axios": "^1.9.0"
   }
 }

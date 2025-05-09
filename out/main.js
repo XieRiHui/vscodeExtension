@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFunctionNode = getFunctionNode;
 const parser_1 = require("@babel/parser");
-const traverse_1 = require("@babel/traverse");
+const traverse_1 = __importDefault(require("@babel/traverse"));
 function getFunctionNode(code, index) {
     let functionNode;
     const ast = (0, parser_1.parse)(code);
@@ -19,4 +22,5 @@ function getFunctionNode(code, index) {
     });
     return functionNode;
 }
+// import fetch from 'node-fetch';
 //# sourceMappingURL=main.js.map
