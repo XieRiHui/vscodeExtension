@@ -251,7 +251,7 @@ connection.onCompletion(
 		return [
 			{
 				label: '智谱AI代码补全',
-				filterText: '[1-9a-zA-Z\\./*\\+- \\]\\[\\(\\)]+',
+				filterText: 'help',
 				kind: CompletionItemKind.Text,
 				data: 1,
 				preselect: true,//优先显示
