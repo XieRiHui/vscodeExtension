@@ -56,6 +56,7 @@ connection.onInitialize((params: InitializeParams) => {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
 			completionProvider: {
+				// triggerCharacters: [...'0123456789abcdefghijklmnopqrsuvwxyztABCDEFGHIJKLMNOPQRSTUVWXYZ@ *-/+.[]()=|&!'],
 				resolveProvider: true
 			},
 			diagnosticProvider: {
@@ -215,26 +216,15 @@ import { getZhipuSuggestion } from './zhipu';
 // 提供代码补全item
 connection.onCompletion(
 	async (position: TextDocumentPositionParams): Promise<CompletionItem[]> => {
-		//得到用户当前输入 
-
-
-		//正则匹配输入
-
-		//然后再return 否则return []
-		//单纯的filterText只能纯文本匹配
-
-
-		//得到当前光标的位置
-		const nowPosition =position.position;
-		const startRange = {line:nowPosition.line,character:nowPosition.character-1};
-		const endRange = nowPosition;
-		
-		//得到suggestion
-		// 获取代码上下文
+		//得到当前文件
 		const document = documents.get(position.textDocument.uri);
 		if(!document){return [];}
-
+		//得到当前光标的位置
+		const nowPosition =position.position;
+		// const startRange = {line:nowPosition.line,character:nowPosition.character-1};
+		// const endRange = nowPosition;
 		const nowVscodePosition = Position.create(nowPosition.line,nowPosition.character);
+
 		//文件末尾简单位置
 		const lastPosition = document.positionAt(document.getText().length);
 		const lastVscodePosition = Position.create(lastPosition.line,lastPosition.character);
@@ -245,26 +235,49 @@ connection.onCompletion(
 		suggestion = suggestion.substring(1,suggestion.length-1);
 
 		// const snippet = new vscode.SnippetString(suggestion);
-		
-		
-		
-		return [
+		const lastChar = document.getText(Range.create(Position.create(nowPosition.line,nowPosition.character-1),nowPosition));
+		console.log("lastChar:",lastChar,"\nsuggestion:",suggestion);
+		// const results =[];
+		// for (let i = 0;i<26;i++ ){
+		// 	const obj = {
+		// 		label: '$(9-9) 智谱AI代码补全',
+		// 		kind: CompletionItemKind.Text,
+		// 		data: 1,
+		// 		filterText: '',
+		// 		preselect: true,//优先显示
+		// 		detail: "向智谱大模型发送请求得到的代码补全提示",
+		// 		textEdit:{
+		// 			range:{
+		// 				start:nowPosition,
+		// 				end:nowPosition
+		// 			},
+		// 			newText:suggestion
+		// 		}
+		// 	};
+		// 	obj.filterText = 'a' +i;
+		// 	results.push(obj);
+		// 	obj.filterText = 'A' +i;
+		// 	results.push(obj);
+		// }
+		// console.log('aaa');
+		return 	[
 			{
-				label: '智谱AI代码补全',
-				filterText: 'help',
+				label: '$(9-9) 智谱AI代码补全',
 				kind: CompletionItemKind.Text,
 				data: 1,
+				filterText : lastChar,
 				preselect: true,//优先显示
 				detail: "向智谱大模型发送请求得到的代码补全提示",
 				textEdit:{
 					range:{
-						start:startRange,
-						end:endRange
+						start:nowPosition,
+						end:nowPosition
 					},
 					newText:suggestion
 				}
 			}
-		];
+			];
+
 	}
 );
 
@@ -288,3 +301,16 @@ documents.listen(connection);
 
 // Listen on the connection
 connection.listen();
+
+
+//废弃代码  正则得到当前输入的单词
+// // 查看当前输入是否匹配
+// const line = document.getText({
+// 							start: { line: nowPosition.line, character: 0 },
+// 							end: nowPosition});
+								
+// const currentWord = line.match(/(\w+)$/)?.[1] || '';
+// const regex = /[1-9a-zA-Z./*\]+\-() []/;		
+// if(!regex.test(currentWord)||currentWord.length<2){return [];}	
+// 
+// console.log("currentWord:",currentWord);

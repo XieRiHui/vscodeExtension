@@ -21,7 +21,16 @@
 	],
 	"main": "./client/out/extension",
 	"contributes": {
-		"configuration": {
+		"icons":{
+			"9-9": {
+				"description": "daing",
+				"default": {
+					"fontPath": "/dai.woff",
+					"fontCharacter": "\\e9e4"
+				}
+			}
+		}
+		,"configuration": {
 			"type": "object",
 			"title": "Example configuration",
 			"properties": {
