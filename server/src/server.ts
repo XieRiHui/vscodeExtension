@@ -2,6 +2,7 @@
 import {
 	Position,
 	Range,
+	// TextEdit,
 	createConnection,
 	TextDocuments,
 	Diagnostic,
@@ -58,11 +59,13 @@ connection.onInitialize((params: InitializeParams) => {
 			completionProvider: {
 				// triggerCharacters: [...'0123456789abcdefghijklmnopqrsuvwxyztABCDEFGHIJKLMNOPQRSTUVWXYZ@ *-/+.[]()=|&!'],
 				resolveProvider: true
+				
 			},
 			diagnosticProvider: {
 				interFileDependencies: false,
 				workspaceDiagnostics: false
-			}
+			},
+			
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -212,7 +215,7 @@ connection.onDidChangeWatchedFiles(_change => {
 
 import { getZhipuSuggestion } from './zhipu';
 
-
+let nowPosition : Position;
 // 提供代码补全item
 connection.onCompletion(
 	async (position: TextDocumentPositionParams): Promise<CompletionItem[]> => {
@@ -220,7 +223,7 @@ connection.onCompletion(
 		const document = documents.get(position.textDocument.uri);
 		if(!document){return [];}
 		//得到当前光标的位置
-		const nowPosition =position.position;
+		nowPosition =position.position;
 		// const startRange = {line:nowPosition.line,character:nowPosition.character-1};
 		// const endRange = nowPosition;
 		const nowVscodePosition = Position.create(nowPosition.line,nowPosition.character);
@@ -232,34 +235,19 @@ connection.onCompletion(
 		const afterText = document.getText(Range.create(nowVscodePosition, lastVscodePosition));
 		// 调用智谱API
 		let suggestion=await getZhipuSuggestion(beforeText,afterText);
-		suggestion = suggestion.substring(1,suggestion.length-1);
+		
+		//根据&&&截取补全的内容
+		//因为有的时候可能截取到中文，因此放到一个循环里，确保是英文
+		let index1 = -1,index2=-4;
+		do{
+			index1 = suggestion.indexOf("&&&",index2+4); //&&&是要求返回格式
+			index2 = suggestion.indexOf("&&&", index1 + 4);
+			suggestion = suggestion.substring(index1 + 3, index2);
+			console.log("\nsuggestion:\n",suggestion);
+		}while(isChineseChar(suggestion.charAt(0)));
 
-		// const snippet = new vscode.SnippetString(suggestion);
 		const lastChar = document.getText(Range.create(Position.create(nowPosition.line,nowPosition.character-1),nowPosition));
-		console.log("lastChar:",lastChar,"\nsuggestion:",suggestion);
-		// const results =[];
-		// for (let i = 0;i<26;i++ ){
-		// 	const obj = {
-		// 		label: '$(9-9) 智谱AI代码补全',
-		// 		kind: CompletionItemKind.Text,
-		// 		data: 1,
-		// 		filterText: '',
-		// 		preselect: true,//优先显示
-		// 		detail: "向智谱大模型发送请求得到的代码补全提示",
-		// 		textEdit:{
-		// 			range:{
-		// 				start:nowPosition,
-		// 				end:nowPosition
-		// 			},
-		// 			newText:suggestion
-		// 		}
-		// 	};
-		// 	obj.filterText = 'a' +i;
-		// 	results.push(obj);
-		// 	obj.filterText = 'A' +i;
-		// 	results.push(obj);
-		// }
-		// console.log('aaa');
+			
 		return 	[
 			{
 				label: '$(9-9) 智谱AI代码补全',
@@ -284,13 +272,16 @@ connection.onCompletion(
 //对上述函数提供的代码补全item做额外的处理
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		// if (item.data === 1) {
-		// 	item.detail = 'TypeScript details';
-		// 	item.documentation = 'TypeScript documentation';
-		// } else if (item.data === 2) {
-		// 	item.detail = 'JavaScript details';
-		// 	item.documentation = 'JavaScript documentation';
-		// }
+		// 发送命令显示预览
+		let length = item.textEdit?.newText.length;
+		if(length===undefined){length = 1;}
+
+        connection.sendNotification('client/executeCommand',{
+			text:item.textEdit?.newText,
+			range: {start:nowPosition,end:Position.create(nowPosition.line,nowPosition.character+ length)}
+		});
+
+
 		return item;
 	}
 );
@@ -302,15 +293,7 @@ documents.listen(connection);
 // Listen on the connection
 connection.listen();
 
-
-//废弃代码  正则得到当前输入的单词
-// // 查看当前输入是否匹配
-// const line = document.getText({
-// 							start: { line: nowPosition.line, character: 0 },
-// 							end: nowPosition});
-								
-// const currentWord = line.match(/(\w+)$/)?.[1] || '';
-// const regex = /[1-9a-zA-Z./*\]+\-() []/;		
-// if(!regex.test(currentWord)||currentWord.length<2){return [];}	
-// 
-// console.log("currentWord:",currentWord);
+function isChineseChar(ch: string){
+    const pattern = /[\u4e00-\u9fa5]/;
+    return pattern.test(ch);
+}
