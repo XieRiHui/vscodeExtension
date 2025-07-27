@@ -1,14 +1,14 @@
 {
-	"name": "lspexample",
-	"description": "A language server example",
-	"author": "Microsoft Corporation",
+	"name": "mmmExtention",
+	"description": "A language server extension",
+	"author": "asPig",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
 	},
-	"publisher": "vscode-samples",
+	"publisher": "XieRiHui",
 	"categories": [],
 	"keywords": [
 		"multi-root ready"

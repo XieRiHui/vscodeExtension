@@ -276,11 +276,10 @@ connection.onCompletionResolve(
 		let length = item.textEdit?.newText.length;
 		if(length===undefined){length = 1;}
 
-        connection.sendNotification('client/executeCommand',{
+        connection.sendNotification('myppp',{
 			text:item.textEdit?.newText,
 			range: {start:nowPosition,end:Position.create(nowPosition.line,nowPosition.character+ length)}
 		});
-
 
 		return item;
 	}

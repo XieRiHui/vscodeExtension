@@ -1,7 +1,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-
+import * as fs from 'fs';
 
 import {
 	LanguageClient,
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 		clientOptions
 	);
 
-	client.onNotification('client/executeCommand',(previewInfo)=>{
+	client.onNotification('myppp',(previewInfo)=>{
 		showPreview(previewInfo);
 	});
 
@@ -59,8 +59,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 }
+
+
+
 // 显示预览
 function showPreview(previewInfo: {text:string,range:vscode.Range}){
+
+	test();
+
 	const editor = vscode.window.activeTextEditor;
 	if(!editor){
 		return;
@@ -114,6 +120,45 @@ function clearPreview(){
 	
 }
 
+//获取文件夹目录/其他文件内容API测试
+// function test_anyLocalFile(){
+// 	const path = "C:\\Users\\lenovo\\Desktop\\aaa.c";
+// 	vscode.workspace.openTextDocument(path).then( document =>{
+// 		console.log(document.getText());
+// 	});
+
+// }
+
+function test(){
+	function getAllFiles(dirPath, arrayOfFiles = []) {
+		const files = fs.readdirSync(dirPath);
+		
+		files.forEach(file => {
+			const fullPath = path.join(dirPath, file);
+			if (fs.statSync(fullPath).isDirectory()) {
+				arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);
+			} else {
+				arrayOfFiles.push(fullPath);
+			}
+		});
+		
+		return arrayOfFiles;
+	}
+
+	// 获取当前工作目录所有文件
+	const allFiles = getAllFiles("C:\\Users\\lenovo\\Desktop\\lanqiao");
+	//显示文件路径
+	
+	vscode.window.showInformationMessage(allFiles[0]);
+
+	//显示第一个文件内容
+	vscode.workspace.openTextDocument(allFiles[0]).then(
+		document =>{
+			vscode.window.showInformationMessage(document.getText());
+		}
+	);
+
+}
 
 export function deactivate(): Thenable<void> | undefined {
 	//关闭插件前清除预览
